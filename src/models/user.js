@@ -12,19 +12,19 @@ const userSchema = new mongoose.Schema({
         trim: true,
     },
     email: {
-        type: String, 
+        type: String,
         required: true,
         unique: true,
         trim: true,
         validate(value) {
-            if (!validator.isEmail(value)){
+            if (!validator.isEmail(value)) {
                 throw new Error('Invalid Email!')
             }
         }
     },
     password: {
-        type:String,
-        required:true,
+        type: String,
+        required: true,
         trim: true,
         minlength: 8,
         validate(value) {
@@ -33,8 +33,8 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    tokens:[{
-        token:{
+    tokens: [{
+        token: {
             type: String,
             required: true
         }
@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
 })
 
 // Virtual Schema for all memes of a user
-userSchema.virtual('memes',{
+userSchema.virtual('memes', {
     ref: 'Meme',
     localField: '_id',
     foreignField: 'author',
@@ -68,7 +68,7 @@ userSchema.methods.toJSON = function () {
 // JSON web token generation
 userSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({ _id: user._id.toString()}, 'sharememesonteamemes')
+    const token = jwt.sign({ _id: user._id.toString() }, 'sharememesonteamemes')
 
     user.tokens = user.tokens.concat({ token })
     await user.save()
@@ -78,8 +78,8 @@ userSchema.methods.generateAuthToken = async function () {
 
 // Login validation
 userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({email})
-    
+    const user = await User.findOne({ email })
+
     if (!user) {
         throw new Error('Unable to login.')
     }
@@ -99,7 +99,7 @@ userSchema.pre('save', async function (next) {
     const user = this
 
     if (user.isModified('password')) {
-        user.password = await bcrypt.hash(user.password, 8)
+        user.password = await bcrypt.hash(user.password, 20)
     }
 
     next()
